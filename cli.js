@@ -5,7 +5,12 @@ const FS = require('fs');
 const PATH = require('path');
 const SPAWN = require('child_process').spawn;
 
-const intputPath = process.argv[2] || '';
+if(process.argv[2] !== '-p'){
+  console.log('Usage: arc-to-geo -p PATH/TO/ARC');
+  process.exit();
+}
+
+const intputPath = process.argv[3] || '';
 
 const root = PATH.isAbsolute(intputPath) ? intputPath: PATH.join(process.cwd(),intputPath);
 
