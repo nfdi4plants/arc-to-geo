@@ -1,0 +1,14 @@
+{
+  "name": "arc-to-geo",
+  "version": "1.0.0",
+  "description": "TODO",
+  "dependencies": {
+    "exceljs": "^4.2.1"
+  },
+  "main": "cli.js",
+  "bin": {
+    "arc-to-geo": "./cli.js"
+  },
+  "author": "Jonas Lukasczyk",
+  "license": "TODO"
+}
