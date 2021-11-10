@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
-const FS = require('fs');
-const PATH = require('path');
-const SPAWN = require('child_process').spawn;
+const exceljs = require('exceljs');
+const path = require('path');
+const spawn = require('child_process').spawn;
 
 if(process.argv[2] !== '-p'){
   console.log('Usage: arc-to-geo -p PATH/TO/ARC');
@@ -12,7 +12,7 @@ if(process.argv[2] !== '-p'){
 
 const intputPath = process.argv[3] || '';
 
-const root = PATH.isAbsolute(intputPath) ? intputPath: PATH.join(process.cwd(),intputPath);
+const root = path.isAbsolute(intputPath) ? intputPath: path.join(process.cwd(),intputPath);
 
 const enforceSet = (obj,name,value)=>{
   if(value===null || value===undefined)
@@ -130,9 +130,8 @@ async function convert(arcJson){
   console.log(`Converting arc.json to geo.xlsx`);
 
   console.log(` - Annotating Header`);
-  const EXCELJS = require('exceljs');
-  const workbook = new EXCELJS.Workbook();
-  await workbook.xlsx.readFile('./template.xlsx');
+  const workbook = new exceljs.Workbook();
+  await workbook.xlsx.readFile(path.join(__dirname, './template.xlsx'));
 
   const worksheet = workbook.getWorksheet(1);
   const findFirstOccurence = value=>{
@@ -174,12 +173,8 @@ async function convert(arcJson){
     let sampleRowIdx = findFirstOccurence('Sample name');
     const sampleHeaderRow = worksheet.getRow(sampleRowIdx);
     let offset = 2;
-    for(let name of pNames)
-      sampleHeaderRow.getCell(offset++).value = `[P]${name}`;
-    for(let name of fNames)
-      sampleHeaderRow.getCell(offset++).value = `[F]${name}`;
-    for(let name of cNames)
-      sampleHeaderRow.getCell(offset++).value = `[C]${name}`;
+    for(let [name,prefix] of [[pNames,'P'],[fNames,'F'],[cNames,'C']])
+      sampleHeaderRow.getCell(offset++).value = `[${prefix}]${name}`;
     sampleHeaderRow.getCell(offset++).value = `raw file`;
 
     for(let [rdfName,rdf] of rawDataFiles){
@@ -220,13 +215,12 @@ async function convert(arcJson){
   // prevent rows exceed bug
   worksheet.spliceRows(6500, 3000);
 
-  await workbook.xlsx.writeFile('./geo.xlsx');
-
+  await workbook.xlsx.writeFile(path.join(intputPath, 'geo.xlsx'));
 }
 
 function getArcJson(){
   console.log(`Retrieving arc.json`);
-  const arcProcess = SPAWN('arc', ['-v','0','export'] , {cwd:root});
+  const arcProcess = spawn('arc', ['-v','0','export'] , {cwd:root});
 
   let jsonAsString = '';
   arcProcess.stdout.setEncoding('utf8');
