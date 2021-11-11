@@ -1,5 +1,6 @@
 # Usage Example
-`node cli.js -p PATH/TO/ARC`
+First install dependencies via `npm install`.
+Then run `node cli.js -p PATH/TO/ARC`.
 
 # Packaging Executables
 Requires pgk which must be globally installed via `npm install -g pkg`.
